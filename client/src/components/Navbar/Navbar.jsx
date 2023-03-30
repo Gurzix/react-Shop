@@ -38,7 +38,7 @@ export const Navbar = () => {
         </div>
         <div className="center">
           <Link className="link" to="/">
-            GURZIXSTORE
+            gurziXstore
           </Link>
         </div>
         <div className="right">

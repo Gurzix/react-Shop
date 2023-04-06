@@ -2,31 +2,45 @@ import React, { useState } from "react";
 import "./products.scss";
 import { List } from "../../components/List/List";
 import { useParams } from "react-router-dom";
-
+import useFetch from "../../hooks/useFetch";
 export default function Products() {
   const catId = parseInt(useParams().id);
   const [maxPrice, setMaxPrice] = useState(1000);
   const [sort, setSort] = useState(null);
+  const [selectedSubCats, setSelectedSubCats] = useState([]);
+  const { data, loading, error } = useFetch(
+    `/sub-categories?[filter][categories][id][$eq]=${catId}`
+  );
+
+  const handleOnChange = (e) => {
+    const value = e.target.value;
+    const isChecked = e.target.checked;
+
+    setSelectedSubCats(
+      isChecked
+        ? [...selectedSubCats, value]
+        : selectedSubCats.filter((item) => item !== value)
+    );
+  };
+
+  console.log(selectedSubCats);
+
   return (
     <div className="products">
       <div className="left">
         <div className="filterItems">
           <h2>Filter Products</h2>
-          <div className="inputItem">
-            {" "}
-            <input type="checkbox" id="1" value={1} />
-            <label htmlFor="1">Shoes</label>
-          </div>
-          <div className="inputItem">
-            {" "}
-            <input type="checkbox" id="2" value={2} />
-            <label htmlFor="2">Jeans</label>
-          </div>
-          <div className="inputItem">
-            {" "}
-            <input type="checkbox" id="3" value={3} />
-            <label htmlFor="3">T-shirts</label>
-          </div>
+          {data?.map((item) => (
+            <div className="inputItem" key={item.id}>
+              <input
+                type="checkbox"
+                id={item.id}
+                value={item.id}
+                onChange={handleOnChange}
+              />
+              <label htmlFor={item.id}>{item.attributes.title}</label>
+            </div>
+          ))}
         </div>
         <div className="filterItems">
           <h2>Filter by Price</h2>
@@ -71,7 +85,12 @@ export default function Products() {
           alt=""
           className="catImg"
         />
-        <List catId={catId} sort={sort} maxPrice={maxPrice} />
+        <List
+          catId={catId}
+          sort={sort}
+          maxPrice={maxPrice}
+          subCats={selectedSubCats}
+        />
       </div>
     </div>
   );

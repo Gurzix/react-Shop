@@ -1,40 +1,44 @@
 import React from "react";
 import "./cart.scss";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-
+import { useSelector, useDispatch } from "react-redux";
+import { removeItem, resetCart } from "../../redux/cartReducer";
 export const Cart = () => {
-  const data = [
-    {
-      id: 1,
-      img: "https://images.pexels.com/photos/1127000/pexels-photo-1127000.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      img2: "https://images.pexels.com/photos/794062/pexels-photo-794062.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      title: "kurtka",
-      isNew: true,
-      oldPrice: 20,
-      price: 15,
-      desc: "loredDJNASJFBHADSBFKADSBnkjvbkdasbvkabkjnsv   sjdvnskdvb jsdfbkjB JKdfj",
-    },
-  ];
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.cart.products);
+  const totalPrice = () => {
+    let total = 0;
+
+    products.forEach((product) => (total += product.quantity * product.price));
+    return total.toFixed(2);
+  };
   return (
     <div className="cart">
       <h1>Products in your cart</h1>
-      {data?.map((item) => (
+      {products?.map((item) => (
         <div className="item" key={item.id}>
-          <img src={item.img} alt="" />
+          <img src={process.env.REACT_APP_UPLOAD_URL + item.img} alt="" />
           <div className="details">
             <h1>{item.title}</h1>
             <p>{item.desc?.substring(0, 100)}</p>
-            <div className="price">1 x ${item.price}</div>
+            <div className="price">
+              {item.quantity} x ${item.price}
+            </div>
           </div>
-          <DeleteOutlinedIcon className="delete" />
+          <DeleteOutlinedIcon
+            className="delete"
+            onClick={() => dispatch(removeItem(item.id))}
+          />
         </div>
       ))}
       <div className="total">
         <span>SUBTOTAL</span>
-        <span>123$</span>
+        <span>${totalPrice()}</span>
       </div>
       <button>PROCEED TO CHECKOUT</button>
-      <span className="reset">Reset Cart</span>
+      <span className="reset" onClick={() => dispatch(resetCart())}>
+        Reset Cart
+      </span>
     </div>
   );
 };
